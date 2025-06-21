@@ -67,17 +67,17 @@ def form_data():
 
 
 @pytest.fixture
-def comments(author, news_list):
+def comments(author, news):
     now = timezone.now()
     for index in range(10):
         comment = Comment.objects.create(
-            news=news_list[0],
+            news=news,
             author=author,
             text=f'Текст комментария {index}'
         )
         comment.created = now + timedelta(days=index)
         comment.save()
-    return Comment.objects.filter(news=news_list[0])
+    return Comment.objects.filter(news=news)
 
 
 @pytest.fixture
