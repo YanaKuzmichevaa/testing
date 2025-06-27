@@ -1,10 +1,9 @@
 import pytest
-
-from datetime import datetime, timedelta
-
 from django.conf import settings
 from django.test.client import Client
 from django.utils import timezone
+
+from datetime import datetime, timedelta
 
 from news.forms import BAD_WORDS
 from news.models import Comment, News
@@ -42,7 +41,7 @@ def news(db):
 @pytest.fixture
 def news_list(db):
     today = datetime.today()
-    return News.objects.bulk_create(
+    News.objects.bulk_create(
         News(
             title=f'Новость {index}',
             text='Просто текст.',
@@ -77,12 +76,6 @@ def comments(author, news):
         )
         comment.created = now + timedelta(days=index)
         comment.save()
-    return Comment.objects.filter(news=news)
-
-
-@pytest.fixture
-def news_pk(news):
-    return (news.pk,)
 
 
 @pytest.fixture

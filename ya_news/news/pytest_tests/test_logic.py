@@ -1,10 +1,8 @@
 import pytest
-
 from pytest_django.asserts import assertRedirects, assertFormError
+from django.urls import reverse
 
 from http import HTTPStatus
-
-from django.urls import reverse
 
 from news.forms import WARNING
 from news.models import Comment
@@ -18,6 +16,7 @@ def test_auth_user_can_post_comment(author_client, author, form_data, news):
     new_comment = Comment.objects.get()
     assert new_comment.text == form_data['text']
     assert new_comment.author == author
+    assert new_comment.news == news
 
 
 @pytest.mark.django_db
@@ -30,13 +29,17 @@ def test_anonymous_user_cant_post_comment(client, form_data, news):
     assert Comment.objects.count() == 0
 
 
-def test_author_can_edit_comment(author_client, form_data, news, comment):
+def test_author_can_edit_comment(
+        author_client, form_data, news, comment, author
+):
     url = reverse('news:edit', args=(comment.pk,))
     response = author_client.post(url, form_data)
     redirect_url = reverse('news:detail', args=(news.pk,))
     assertRedirects(response, f'{redirect_url}#comments')
-    comment.refresh_from_db()
-    assert comment.text == form_data['text']
+    new_comment = Comment.objects.get(id=comment.pk)
+    assert new_comment.text == form_data['text']
+    assert new_comment.author == author
+    assert new_comment.news == news
 
 
 def test_author_can_delete_comment(author_client, news, comment):
@@ -47,12 +50,16 @@ def test_author_can_delete_comment(author_client, news, comment):
     assert Comment.objects.count() == 0
 
 
-def test_reader_cant_edit_other_comment(reader_client, comment, form_data):
+def test_reader_cant_edit_other_comment(
+        reader_client, comment, form_data, news, author
+):
     url = reverse('news:edit', args=(comment.pk,))
     response = reader_client.post(url, form_data)
     assert response.status_code == HTTPStatus.NOT_FOUND
     comment_from_db = Comment.objects.get(id=comment.id)
     assert comment.text == comment_from_db.text
+    assert comment.author == author
+    assert comment.news == news
 
 
 def test_reader_cant_delete_other_comment(reader_client, comment):
