@@ -1,44 +1,8 @@
+from http import HTTPStatus
+
 import pytest
 from pytest_django.asserts import assertRedirects
 from pytest_lazyfixture import lazy_fixture
-from django.urls import reverse
-
-from http import HTTPStatus
-
-
-@pytest.fixture
-def home_url():
-    return reverse('news:home')
-
-
-@pytest.fixture
-def detail_url(news):
-    return reverse('news:detail', args=(news.pk,))
-
-
-@pytest.fixture
-def login_url():
-    return reverse('users:login')
-
-
-@pytest.fixture
-def logout_url():
-    return reverse('users:logout')
-
-
-@pytest.fixture
-def signup_url():
-    return reverse('users:signup')
-
-
-@pytest.fixture
-def edit_url(comment):
-    return reverse('news:edit', args=(comment.pk,))
-
-
-@pytest.fixture
-def delete_url(comment):
-    return reverse('news:delete', args=(comment.pk,))
 
 
 HOME_URL = lazy_fixture('home_url')

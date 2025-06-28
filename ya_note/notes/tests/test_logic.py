@@ -59,7 +59,7 @@ class TestLogic(TestFixtures):
         self.assertEqual(updated_note.title, self.form_data['title'])
         self.assertEqual(updated_note.text, self.form_data['text'])
         self.assertEqual(updated_note.slug, self.form_data['slug'])
-        self.assertEqual(updated_note.author, self.author)
+        self.assertEqual(updated_note.author, self.note.author)
 
     def test_author_can_delete_note(self):
         num_of_notes = Note.objects.count()
@@ -79,7 +79,7 @@ class TestLogic(TestFixtures):
         self.assertEqual(self.note.title, note_from_db.title)
         self.assertEqual(self.note.text, note_from_db.text)
         self.assertEqual(self.note.slug, note_from_db.slug)
-        self.assertEqual(self.note.author, self.author)
+        self.assertEqual(self.note.author, note_from_db.author)
 
     def test_other_user_cant_delete_note(self):
         num_of_notes = Note.objects.count()

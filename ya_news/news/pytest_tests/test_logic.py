@@ -1,8 +1,8 @@
+from http import HTTPStatus
+
 import pytest
 from pytest_django.asserts import assertRedirects, assertFormError
 from django.urls import reverse
-
-from http import HTTPStatus
 
 from news.forms import WARNING
 from news.models import Comment
@@ -29,17 +29,15 @@ def test_anonymous_user_cant_post_comment(client, form_data, news):
     assert Comment.objects.count() == 0
 
 
-def test_author_can_edit_comment(
-        author_client, form_data, news, comment, author
-):
+def test_author_can_edit_comment(author_client, form_data, news, comment):
     url = reverse('news:edit', args=(comment.pk,))
     response = author_client.post(url, form_data)
     redirect_url = reverse('news:detail', args=(news.pk,))
     assertRedirects(response, f'{redirect_url}#comments')
     new_comment = Comment.objects.get(id=comment.pk)
     assert new_comment.text == form_data['text']
-    assert new_comment.author == author
-    assert new_comment.news == news
+    assert new_comment.author == comment.author
+    assert new_comment.news == comment.news
 
 
 def test_author_can_delete_comment(author_client, news, comment):
@@ -50,16 +48,14 @@ def test_author_can_delete_comment(author_client, news, comment):
     assert Comment.objects.count() == 0
 
 
-def test_reader_cant_edit_other_comment(
-        reader_client, comment, form_data, news, author
-):
+def test_reader_cant_edit_other_comment(reader_client, comment, form_data):
     url = reverse('news:edit', args=(comment.pk,))
     response = reader_client.post(url, form_data)
     assert response.status_code == HTTPStatus.NOT_FOUND
     comment_from_db = Comment.objects.get(id=comment.id)
     assert comment.text == comment_from_db.text
-    assert comment.author == author
-    assert comment.news == news
+    assert comment.author == comment_from_db.author
+    assert comment.news == comment_from_db.news
 
 
 def test_reader_cant_delete_other_comment(reader_client, comment):
