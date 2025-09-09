@@ -46,3 +46,4 @@ Dev
 ```sh
 bash run_tests.sh
 ```
+#### Тесты разработаны: [Яна](https://github.com/YanaKuzmichevaa)
